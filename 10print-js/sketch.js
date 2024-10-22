@@ -1,23 +1,32 @@
 const canvasSketch = require('canvas-sketch');
 const random = require('canvas-sketch-util/random');
 const colors = require('riso-colors');
+const colorPkg = require('color');
 
 const settings = {
   dimensions: [2048, 2048],
   //dimensions: 'a4',
   pixelsPerInch: 300,
   animate: true,
-  playing: false
+  playing: true,
+  fps: 24,
+  duration: 10
 };
 
 const sketch = () => {
   const goldenRatio = 1.618;
   const baseStep = 20;
   const step = baseStep * goldenRatio;
-  const numStrokesPerLine = 4;
+  const numStrokesPerLine = 10;
+
+  filteredColors = colors.filter(color => {
+    const hsl = colorPkg(color.hex).hsl().object();
+    return hsl.l > 20;
+  });
+
   return ({ context, width, height, time }) => {
-    //let waveTime = time / Math.PI * 180.0;
-    //console.log("time: ", waveTime);
+    let waveTime = time / Math.PI * 180.0;
+    console.log("time: ", waveTime);
 
     context.fillStyle = 'hsl(0, 0%, 98%)';
     context.fillRect(0, 0, width, height);
@@ -26,17 +35,18 @@ const sketch = () => {
       for (let y = 0; y < height; y += step) {
 
         let r = random.value();
-        const color = colors[Math.floor(Math.random() * colors.length)];
+        const color = filteredColors[Math.floor(Math.random() * filteredColors.length)];
+        console.log(color);
         
         for (let i = 0; i < numStrokesPerLine; i++) {
 
-          const noiseFrequency = random.range(0.02, 0.2);
+          const noiseFrequency = random.range(0.02, 0.5);
           const noiseAmplitude = random.range(0, 50);
 
           const pressureVariation = random.noise2D(x, y, noiseFrequency, 1);
 
           context.lineWidth = random.range(1.0, 10.0) * (1 + pressureVariation);
-          context.globalAlpha = random.range(0.3, 0.7) * (1 + pressureVariation * 1);
+          context.globalAlpha = random.range(0.3, 0.7) * (1 + pressureVariation * 0.5);
 
           let lengthMultiplier = random.range(0.1, 1.0);
 
@@ -45,8 +55,9 @@ const sketch = () => {
           let endWobbleX = random.range(-15, 15) * (1 - i  * 0.2) * lengthMultiplier;
           let endWobbleY = random.range(-15, 15) * (1 - i * 0.2) * lengthMultiplier;
 
-          const noise = random.noise2D(x + random.range(-15, 15), y + random.range(-15, 15), noiseFrequency, noiseAmplitude);
-          let rotationAngle = Math.sin(x * 0.2 + y * 0.2) * Math.PI * goldenRatio * 0.1;
+          const noise = random.noise2D(x + random.range(-1, 1), y + random.range(-1, 1), noiseFrequency, noiseAmplitude);
+          let rotationAngle = Math.sin(x * 0.2 + y * 0.2 + time) * Math.PI * goldenRatio * 0.1;
+          console.log(time);
 
           context.save();
           context.translate(x + step / 2, y + step / 2);
