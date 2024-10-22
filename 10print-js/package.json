@@ -13,6 +13,7 @@
     "canvas-sketch": "^0.7.7"
   },
   "devDependencies": {
-    "canvas-sketch-util": "^1.10.0"
+    "canvas-sketch-util": "^1.10.0",
+    "riso-colors": "^1.0.1"
   }
 }
