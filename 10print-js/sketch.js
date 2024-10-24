@@ -70,7 +70,7 @@ guiControl.add(params, 'primaryColorName', risoColors.map(color => color.name))
   });
 
 
-  guiControl.add(params, 'randomness', 0, 1).name('Randomness').onChange(() => {
+  guiControl.add(params, 'randomness', 0, 1).name('Distance').onChange(() => {
     if (manager) {
       manager.render();
     }
