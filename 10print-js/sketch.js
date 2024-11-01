@@ -7,7 +7,8 @@ const settings = {
   dimensions: [2048, 2048],
   //dimensions: 'a4',
   pixelsPerInch: 300,
-  animate: false,
+  animate: true,
+  fps: 8,
   duration: 12
 };
 
@@ -22,7 +23,9 @@ const params = {
 
   waveType: 'sine', 
 
-  randomness: 0.5
+  randomness: 0.176,
+
+  margin: 0
 };
 
 getColorByName = (name) => {
@@ -36,8 +39,14 @@ getColorByName = (name) => {
 
 const guiControl = new gui.GUI();
 
+guiControl.add(params, 'margin', 0, 200).name('Margin').onChange(() => {
+  if (manager) {
+    manager.render();
+  }
+});
+
 guiControl.add(params, 'primaryColorName', risoColors.map(color => color.name))
-  .name('Primary Color')
+  .name('Color 1')
   .onChange((name) => {
     params.primaryColor = getColorByName(name);
     if (manager) {
@@ -46,7 +55,7 @@ guiControl.add(params, 'primaryColorName', risoColors.map(color => color.name))
   });
 
   guiControl.add(params, 'secondaryColorName', risoColors.map(color => color.name))
-  .name('Secondary Color')
+  .name('Color 2')
   .onChange((name) => {
     params.secondaryColor = getColorByName(name);
     if (manager) {
@@ -55,7 +64,7 @@ guiControl.add(params, 'primaryColorName', risoColors.map(color => color.name))
   });
 
   guiControl.add(params, 'accentColorName', risoColors.map(color => color.name))
-  .name('Tertiary Color')
+  .name('Color 3')
   .onChange((name) => {
     params.accentColor = getColorByName(name);
     if (manager) {
@@ -70,7 +79,7 @@ guiControl.add(params, 'primaryColorName', risoColors.map(color => color.name))
   });
 
 
-  guiControl.add(params, 'randomness', 0, 1).name('Distance').onChange(() => {
+  guiControl.add(params, 'randomness', 0, 1).name('Wave distance').onChange(() => {
     if (manager) {
       manager.render();
     }
@@ -88,6 +97,7 @@ const sketch = () => {
   // });
 
   return ({ context, width, height, time }) => {
+    const margin = params.margin;
     const primaryColor = params.primaryColor;
     const secondaryColor = params.secondaryColor;
     const accentColor = params.accentColor;
@@ -97,8 +107,8 @@ const sketch = () => {
     context.fillStyle = 'hsl(0, 0%, 98%)';
     context.fillRect(0, 0, width, height);
 
-    for (let x = 0; x < width; x += step) {
-      for (let y = 0; y < height; y += step) {
+    for (let x = margin; x < width - margin; x += step) {
+      for (let y = margin; y < height - margin; y += step) {
 
         let r = random.value() * params.randomness;
         const color = filteredColors[Math.floor(Math.random() * filteredColors.length)];
@@ -122,20 +132,24 @@ const sketch = () => {
           const noise = random.noise2D(x + random.range(-1, 1), y + random.range(-1, 1), noiseFrequency, noiseAmplitude);
           let rotationAngle;
 
+          const animTime = time * Math.PI * 2 * 0.5;
+
           if (params.waveType === 'sine') {
-            rotationAngle = Math.sin(x * 0.2 + y * 0.2 + time) * Math.PI * goldenRatio * 0.1;
+            rotationAngle = Math.sin(x * 0.2 + y * 0.2 + animTime) * Math.PI * goldenRatio * 0.1;
+            console.log(animTime);
           } else if (params.waveType === 'sqrt') {
-            rotationAngle = Math.sqrt(x * 0.2 + y * 0.2 + time) * Math.PI * goldenRatio * 0.1;
+            rotationAngle = Math.sqrt(x * 0.2 + y * 0.2 + animTime) * Math.PI * goldenRatio * 0.1;
+            console.log(animTime);
           } else if (params.waveType === 'exp') {
-            rotationAngle = Math.pow(x * 0.2 + y * 0.2 + time, 2) % Math.PI * goldenRatio * 0.1;
+            rotationAngle = Math.pow(x * 0.2 + y * 0.2 + animTime, 2) % Math.PI * goldenRatio * 0.1;
+            console.log(animTime);
           } else {
             rotationAngle = random.noise3D(x * 0.2, y * 0.2, Math.PI * goldenRatio * 0.1);
+            console.log(animTime);
           }
-
           context.save();
           context.translate(x + step / 2, y + step / 2);
           context.rotate(rotationAngle);
-
           context.strokeStyle = color;
           context.beginPath();
 
