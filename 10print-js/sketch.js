@@ -21,11 +21,9 @@ const params = {
   secondaryColorName: risoColors[5].name,
   accentColorName: risoColors[59].name,
 
-  waveType: 'sine', 
+  waveType: 'sine',
 
-  randomness: 0.176,
-
-  margin: 0
+  randomness: 0.176
 };
 
 getColorByName = (name) => {
@@ -39,12 +37,6 @@ getColorByName = (name) => {
 
 const guiControl = new gui.GUI();
 
-guiControl.add(params, 'margin', 0, 200).name('Margin').onChange(() => {
-  if (manager) {
-    manager.render();
-  }
-});
-
 guiControl.add(params, 'primaryColorName', risoColors.map(color => color.name))
   .name('Color 1')
   .onChange((name) => {
@@ -54,7 +46,7 @@ guiControl.add(params, 'primaryColorName', risoColors.map(color => color.name))
     }
   });
 
-  guiControl.add(params, 'secondaryColorName', risoColors.map(color => color.name))
+guiControl.add(params, 'secondaryColorName', risoColors.map(color => color.name))
   .name('Color 2')
   .onChange((name) => {
     params.secondaryColor = getColorByName(name);
@@ -63,7 +55,7 @@ guiControl.add(params, 'primaryColorName', risoColors.map(color => color.name))
     }
   });
 
-  guiControl.add(params, 'accentColorName', risoColors.map(color => color.name))
+guiControl.add(params, 'accentColorName', risoColors.map(color => color.name))
   .name('Color 3')
   .onChange((name) => {
     params.accentColor = getColorByName(name);
@@ -72,18 +64,18 @@ guiControl.add(params, 'primaryColorName', risoColors.map(color => color.name))
     }
   });
 
-  guiControl.add(params, 'waveType', ['sine', 'sqrt', 'exp', '3d noise']).name('Wave Type').onChange(() => {
-    if (manager) {
-      manager.render();
-    }
-  });
+guiControl.add(params, 'waveType', ['sine', 'sqrt', 'exp', '3d noise']).name('Wave Type').onChange(() => {
+  if (manager) {
+    manager.render();
+  }
+});
 
 
-  guiControl.add(params, 'randomness', 0, 1).name('Wave distance').onChange(() => {
-    if (manager) {
-      manager.render();
-    }
-  });
+guiControl.add(params, 'randomness', 0, 1).name('Wave distance').onChange(() => {
+  if (manager) {
+    manager.render();
+  }
+});
 
 const sketch = () => {
   const goldenRatio = 1.618;
@@ -97,7 +89,7 @@ const sketch = () => {
   // });
 
   return ({ context, width, height, time }) => {
-    const margin = params.margin;
+    const margin = 160;
     const primaryColor = params.primaryColor;
     const secondaryColor = params.secondaryColor;
     const accentColor = params.accentColor;
@@ -165,6 +157,31 @@ const sketch = () => {
           context.restore();
         }
       }
+
+      // Font stuff.
+      context.save();
+      const fontFill = 'hsl(0, 0%, 20%)';
+      const fontName = 'bold 32px sans-serif';
+      const fontYPos = height - 50;
+
+      context.fillStyle = fontFill;
+      context.font = fontName;
+      context.textAlign = 'left';
+      context.textBaseline = 'bottom';
+      context.fillText('28.10.24', margin, fontYPos);
+
+      context.fillStyle = fontFill;
+      context.font = fontName;
+      context.textAlign = 'center';
+      context.textBaseline = 'bottom';
+      context.fillText('Cascade', width / 2, fontYPos);
+
+      context.fillStyle = fontFill;
+      context.font = fontName;
+      context.textAlign = 'right';
+      context.textBaseline = 'bottom';
+      context.fillText('anith.png', width - margin, fontYPos);
+      context.restore();
     }
   };
 };
